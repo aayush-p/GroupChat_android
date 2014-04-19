@@ -1,4 +1,4 @@
-package com.example.peli_ape;
+package chat.server.sockets;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -8,22 +8,19 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
-public class SocketInfo {
+public class ClientSocketInfo {
 
 	Socket clientSocket;
 	BufferedReader in;
 	PrintWriter out;
 	InputStream temp;
 
-	public static SocketInfo one = new SocketInfo();
-
-	private SocketInfo() {
+	public ClientSocketInfo(Socket c) {
 		try {
-			clientSocket = new Socket("24.185.7.208", 27012);
+			clientSocket = c;
 			temp = clientSocket.getInputStream();
 			in = new BufferedReader(new InputStreamReader(temp));
 			out = new PrintWriter(clientSocket.getOutputStream(), true);
-			
 			//out.println("test2");
 		} catch (UnknownHostException e) {
 			// TODO Auto-generated catch block
@@ -35,32 +32,11 @@ public class SocketInfo {
 		//Toast.makeText(this, "mmm", Toast.LENGTH_SHORT).show();
 	};
 
-	public static SocketInfo getSocketInfo() throws UnknownHostException, IOException {
-//		if (one == null) {
-//			one = new SocketInfo();
-//		}
-		return one;
+	public Socket getSocket(){
+		return clientSocket;
 	}
 
-	public static SocketInfo getSocketInfo(int x) throws UnknownHostException, IOException {
-		//if (one != null) {
-		//	closeSocket();
-		//}
-		one = new SocketInfo();
-		return one;
-	}
-	
-	public static void closeSocket() throws UnknownHostException, IOException {
-		getSocketInfo().clientSocket.shutdownInput();
-		getSocketInfo().clientSocket.shutdownOutput();		
-		getSocketInfo().clientSocket.close();
-		one = null;		
-	}
-	
-//	public Socket getSocket(){
-//		return clientSocket;
-//	}
-	public String sReader() throws IOException{
+	public String sReader() throws IOException {
 //		if (temp.available() < 1){
 //			return null;
 //		}
@@ -69,6 +45,7 @@ public class SocketInfo {
 		return s;
 		//return in;
 	}
+	
 	public void sWriter(String s){
 		out.println(s);
 		//return out;

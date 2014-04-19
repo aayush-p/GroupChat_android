@@ -4,18 +4,31 @@ import java.io.IOException;
 import java.net.UnknownHostException;
 import java.util.LinkedList;
 
+import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.TextView;
 
 public class ChatWindow extends ActionBarActivity {
 
 	LinkedList<String> messages;
 	int listLength;
+	UpdateNewMessages backgroundUpdation;
 
+//	@Override
+//	public void onBackPressed() {
+//		// TODO Auto-generated method stub
+//		
+////		backgroundUpdation.cancel(true);
+//		
+//		super.onBackPressed();
+//	}
+	
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.chat_window);
@@ -23,7 +36,8 @@ public class ChatWindow extends ActionBarActivity {
 		messages = new LinkedList<String>();
 		listLength = 0;
 
-		new UpdateNewMessages().execute();
+		backgroundUpdation = new UpdateNewMessages(this);
+		backgroundUpdation.execute();
 
 	}
 
@@ -55,62 +69,20 @@ public class ChatWindow extends ActionBarActivity {
 	}
 
 
-/*
-	private class PostMessage extends AsyncTask<String, Void, Void> {
-//		Context context;
-//		
-//		public PostMessage(Context context) {
-//			this.context = context.getApplicationContext();
-//		}
-
-		@Override
-		protected Void doInBackground(String... message) {
-            //Toast.makeText(context, "message sending ", Toast.LENGTH_SHORT).show();
-			try {
-				//publishProgress();
-
-				SocketInfo clientSocketInfo = SocketInfo.getSocketInfo();
-				//PrintWriter out = clientSocketInfo.getWriter();
-				clientSocketInfo.sWriter("test3");
-				for (String n : message) {
-		              //out.println(n);
-		              clientSocketInfo.sWriter(n);
-		              //Toast.makeText(context, "message sent: " + n, Toast.LENGTH_SHORT).show();
-				}
-			} catch (UnknownHostException e) {
-				// TODO Auto-generated catch block
-				//Toast.makeText(context, "message sendingvukytxdkyx ", Toast.LENGTH_SHORT).show();
-				e.printStackTrace();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			return null;
-		}
-
-		@Override
-		protected void onPostExecute(Void a) {
-			super.onPostExecute(a);
-			
-			EditText input = (EditText) findViewById(R.id.editText1);
-			input.setText("sent");
-		}
-		
-		@Override
-		protected void onProgressUpdate(Void... values){
-			super.onProgressUpdate(values);
-			EditText input = (EditText) findViewById(R.id.editText1);
-			input.setText("sendingggg");
-		}
-	}
-*/
 
 	private class UpdateNewMessages extends AsyncTask<Void, Void, Void> {
 
+		Context c;
+		
+		public UpdateNewMessages(Context c){
+			this.c = c.getApplicationContext();
+		}
+		
 		@Override
 		protected Void doInBackground(Void... values) {
 
 			try {
+				
 				SocketInfo clientSocketInfo = SocketInfo.getSocketInfo();
 				//BufferedReader in = clientSocketInfo.getReader();
 
@@ -122,14 +94,14 @@ public class ChatWindow extends ActionBarActivity {
 					//String newMessage = in.readLine();
 					if (newMessage != null){
 
-						if (listLength > 10) {
+						if (listLength > 20) {
 							messages.removeFirst();
 						}
 						messages.add(newMessage);
 						listLength++;
 						publishProgress();
 					}
-					Thread.sleep(100);
+					Thread.sleep(10);
 				}
 
 			} catch (UnknownHostException e) {
@@ -149,15 +121,37 @@ public class ChatWindow extends ActionBarActivity {
 		protected void onProgressUpdate(Void... values){
 			super.onProgressUpdate(values);
 			
-			TextView nameView = (TextView)findViewById(R.id.textView1);
-			StringBuilder sb = new StringBuilder();
-			for( String temp: messages){
-				sb.append(temp).append('\n');
-			}
+			ListView msgView = (ListView) findViewById(R.id.listView);
+			 
+//			StringBuilder sb = new StringBuilder();
+//			for( String temp: messages){
+//				sb.append(temp).append('\n');
+//			}
+//			
+//			nameView.setText(sb.toString());
 			
-			nameView.setText(sb.toString());
+			//String s[] = {""};
 
+			//ArrayAdapter<String> a = new ArrayAdapter<String>(c, R.layout.list, objects) 
+			
+			msgView.setAdapter(new ArrayAdapter<String>(c, R.layout.list, messages));
+			msgView.setSelection(listLength);
 		}
+		
+		@Override
+		protected void onCancelled(Void result) {
+			try {
+				SocketInfo.closeSocket();
+				
+			} catch (UnknownHostException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		
 	}
 
 }

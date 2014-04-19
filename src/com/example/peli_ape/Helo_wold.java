@@ -18,7 +18,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 public class Helo_wold extends ActionBarActivity {
-
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		//super.onCreate(savedInstanceState);
@@ -39,7 +39,6 @@ public class Helo_wold extends ActionBarActivity {
 		Toast.makeText(this, "connecting..", Toast.LENGTH_SHORT).show();
 
 		new ConnectToServer(this).execute(string);
-
 	}
 
 	@Override
@@ -89,16 +88,12 @@ public class Helo_wold extends ActionBarActivity {
 		
 		@Override
 		protected Void doInBackground(String... string) {
-			try {
-//				Socket clientSocket = new Socket("10.0.2.2", 2222);
-//				BufferedReader in1 = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-//				PrintWriter out1 = new PrintWriter(clientSocket.getOutputStream(), true);
-//				out1.println("test");
-//				
-				
+			try {				
 				//Toast.makeText(context, "message sending...", Toast.LENGTH_SHORT).show();
+				SocketInfo.closeSocket();
+				
 				SocketInfo clientSocketInfo = SocketInfo.getSocketInfo(2);
-				//PrintWriter out = clientSocketInfo.sWriter(n);
+
 				 for (String n : string) {
 					 clientSocketInfo.sWriter(n);
 		          }
